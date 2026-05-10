@@ -1,244 +1,164 @@
-# Verificar que Flask funciona
-from flask import Flask, render_template, request, redirect, session, url_for
-from dotenv import load_dotenv
-import spotipy
-from spotipy.oauth2 import SpotifyOAuth
-import os
-from spotipy.oauth2 import SpotifyClientCredentials
+"""
+app.py
+======
+Punto de entrada de la aplicación. Solo contiene:
+  - Configuración de Flask
+  - Rutas (qué URL hace qué)
+  - Gestión de sesión (guardar/leer token)
 
-# Cargar variables de entorno (archivo .env)
-load_dotenv()
+La lógica de Spotify está en spotify_api.py
+Las variables de entorno están en config.py
+"""
 
-# Crear la aplicación Flask
+import logging
+from flask import Flask, render_template, request, redirect, session, url_for, abort
+
+import config
+import spotify_api
+
+# ── Configuración de la aplicación ───────────────────────────────────────────
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger(__name__)
+
 app = Flask(__name__)
-app.secret_key = os.urandom(24) # Para manejar las sesiones de forma segura.
+app.secret_key = config.SECRET_KEY
 
-# Configuración de Spotify
-SCOPE = SCOPE = "user-top-read user-read-recently-played user-read-email user-follow-read"
 
-def create_spotify_oauth():
-    return SpotifyOAuth(
-        client_id=os.getenv('SPOTIPY_CLIENT_ID'),
-        client_secret=os.getenv('SPOTIPY_CLIENT_SECRET'),
-        redirect_uri=os.getenv('SPOTIPY_REDIRECT_URI'),
-        scope=SCOPE,
-        show_dialog=True # Forzar el diálogo de selección/consetimiento
-    )
+# ── Helpers de sesión ─────────────────────────────────────────────────────────
 
-def get_spotify_client():
-    # Obtiene un cliente de Spotify autenticado
-    if 'token_info' not in session:
+def get_authenticated_client():
+    """
+    Intenta obtener un cliente de Spotify autenticado desde la sesión.
+    Si no hay token o no se puede renovar, devuelve None.
+
+    Uso en cualquier ruta protegida:
+        sp = get_authenticated_client()
+        if not sp:
+            return redirect(url_for("login"))
+    """
+    token_info = session.get("token_info")
+    if not token_info:
         return None
-    
-    # Verificar si el token necesita renovarse
-    auth_manager = create_spotify_oauth()
-    token_info = session['token_info']
 
-    if auth_manager.is_token_expired(token_info):
-        token_info = auth_manager.refresh_access_token(token_info['refresh_token'])
-        session['token_info'] = token_info
-
-    return spotipy.Spotify(auth=token_info['access_token'])
-
-def get_top_global_albums(limit=15):    
     try:
-        # Crear cliente con Client Credentials
-        auth_manager = SpotifyClientCredentials(
-            client_id=os.getenv('SPOTIPY_CLIENT_ID'),
-            client_secret=os.getenv('SPOTIPY_CLIENT_SECRET')
-        )
-        sp = spotipy.Spotify(auth_manager=auth_manager)
-        print("✓ Cliente de Spotify creado exitosamente")
-        
-        # Lista de artistas populares
-        popular_artists = [
-            'Taylor Swift', 'Bad Bunny', 'Drake', 'The Weeknd', 
-            'Ed Sheeran', 'Ariana Grande', 'Billie Eilish', 
-            'Post Malone', 'Dua Lipa', 'Harry Styles'
-        ]
-        
-        unique_albums = []
-        albums_seen = set()
-        
-        for artist_name in popular_artists:
-            if len(unique_albums) >= limit:
-                break
-                
-            print(f"Buscando álbumes de {artist_name}...")
-            # Buscar el artista
-            results = sp.search(q=artist_name, type='artist', limit=1)
-            
-            if results['artists']['items']:
-                artist_id = results['artists']['items'][0]['id']
-                
-                # Obtener álbumes del artista
-                albums = sp.artist_albums(artist_id, album_type='album', limit=3)
-                
-                for album in albums['items']:
-                    album_id = album.get('id')
-                    
-                    if album_id and album_id not in albums_seen:
-                        albums_seen.add(album_id)
-                        
-                        album_data = {
-                            'name': album.get('name', 'Unknown Album'),
-                            'artist': album.get('artists', [{}])[0].get('name', 'Unknown Artist'),
-                            'image': album.get('images', [{}])[0].get('url') if album.get('images') else None,
-                            'url': album.get('external_urls', {}).get('spotify', '#'),
-                            'release_date': album.get('release_date', 'Unknown')
-                        }
-                        unique_albums.append(album_data)
-                        print(f"  [{len(unique_albums)}] Álbum agregado: {album_data['name']} - {album_data['artist']}")
-                        
-                        if len(unique_albums) >= limit:
-                            break
-        
-        print(f"\n✓ Total de álbumes obtenidos: {len(unique_albums)}")
-        print("=== FIN get_top_global_albums ===\n")
-        return unique_albums
-    
-    except Exception as e:
-        print(f"\n✗ ERROR al obtener álbumes: {e}")
-        print(f"Tipo de error: {type(e).__name__}")
-        import traceback
-        traceback.print_exc()
-        print("=== FIN get_top_global_albums (CON ERROR) ===\n")
-        return []
+        token_info = spotify_api.refresh_token_if_expired(token_info)
+        session["token_info"] = token_info  # Guardar si se renovó
+        return spotify_api.get_client(token_info)
+    except Exception:
+        logger.exception("Error al obtener cliente de Spotify")
+        session.clear()
+        return None
 
-# Definir ruta principal de la web
-@app.route('/')
+
+# ── Rutas públicas ────────────────────────────────────────────────────────────
+
+@app.route("/")
 def index():
-    # Obtener álbumes del top Global para mostrar
-    top_albums = get_top_global_albums(limit=10)
-    return render_template('index.html', top_albums=top_albums)
+    featured_albums = spotify_api.get_featured_albums(limit=10)
+    return render_template("index.html", featured_albums=featured_albums)
 
-# Definir ruta para iniciar autenticación
-@app.route('/login')
+
+# ── Rutas de autenticación ────────────────────────────────────────────────────
+
+@app.route("/login")
 def login():
-    auth_manager = create_spotify_oauth()
-    auth_url = auth_manager.get_authorize_url()
+    oauth = spotify_api.create_oauth()
+    auth_url = oauth.get_authorize_url()
     return redirect(auth_url)
 
-# Ruta de callback (donde Spotify nos redirige después del login)
-@app.route('/callback')
+
+@app.route("/callback")
 def callback():
-    auth_manager = create_spotify_oauth()
+    code = request.args.get("code")
+    if not code:
+        logger.warning("Callback recibido sin código de autorización")
+        return redirect(url_for("index"))
 
-    code = request.args.get('code') # Obtener el código de autorización
-    if code:
-        token_info = auth_manager.get_access_token(code) # Intercambiar el código por un token
-        session['token_info'] = token_info
-        return redirect(url_for('profile'))
-    
-    return redirect(url_for('index'))
+    oauth = spotify_api.create_oauth()
+    token_info = oauth.get_access_token(code)
+    session["token_info"] = token_info
+    return redirect(url_for("profile"))
 
-# Ruta del perfil (donde mostraré las estadísticas)
-@app.route('/profile')
-def profile():
-    sp = get_spotify_client() # Verificar autenticación
-    if not sp:
-        return redirect(url_for('login'))
-    
-    try:
-        # Obtener información del ususario
-        user_info = sp.current_user()
 
-        # Obtener top canciones (Últimos 6 meses)
-        top_tracks = sp.current_user_top_tracks(limit=10, time_range='medium_term')
-
-        # Obtener top artistas (Últimos 6 meses)
-        top_artists = sp.current_user_top_artists(limit=10, time_range='medium_term')
-
-        # Obtener canciones recientes
-        recent_tracks = sp.current_user_recently_played(limit=10)
-
-        # Obtener artistas que sigue el usuario
-        following_artists = sp.current_user_followed_artists(limit=10)
-
-        return render_template('profile.html',
-                               user=user_info,
-                               top_tracks=top_tracks['items'],
-                               top_artists=top_artists['items'],
-                               recent_tracks=recent_tracks['items'],
-                               following_artists=following_artists['artists']['items'])
-    except Exception as e:
-        return f"Error al obtener datos: {str(e)}"
-
-@app.route('/stats/<time_range>')
-def stats_by_time(time_range):
-    # Estadísticas por rango de tiempo específico.
-    sp = get_spotify_client()
-    if not sp:
-        return redirect(url_for('login'))
-    
-    # Validar rango de tiempo
-    valid_ranges = {'short_term': '4 semanas', 'medium_term': '6 meses', 'long_term': 'varios años'}
-    if time_range not in valid_ranges:
-        return redirect(url_for('profile'))
-    
-    try:
-        user_info = sp.current_user()
-        top_tracks = sp.current_user_top_tracks(limit=20, time_range=time_range)
-        top_artists = sp.current_user_top_artists(limit=20, time_range=time_range)
-
-        # Análisis de géneros
-        genres = {}
-        for artist in top_artists['items']:
-            for genre in artist['genres']:
-                genres[genre] = genres.get(genre, 0) + 1
-
-        # Ordenar géneros por popularidad
-        top_genres = sorted(genres.items(), key=lambda x: x[1], reverse=True)[:10]
-
-        return render_template('detailed_stats.html',
-                               user=user_info,
-                             top_tracks=top_tracks['items'],
-                             top_artists=top_artists['items'],
-                             top_genres=top_genres,
-                             time_range=time_range,
-                             time_range_name=valid_ranges[time_range])
-    
-    except Exception as e:
-        return f"Error al obtener estadísticas: {str(e)}"
-
-@app.route('/logout')
+@app.route("/logout")
 def logout():
-    # Obtener token antes de limpiar la sesión
-    token_info = session.get('token_info')
+    session.clear()
+    return redirect(url_for("index"))
 
-    # Limpiar la clave del token
-    session.pop('token_info', None)
-    session.clear() # Limpiar toda la sesión de Flask
 
-    # Intento de limpiar cache de spotipy
+# ── Rutas protegidas (requieren login) ────────────────────────────────────────
+
+@app.route("/profile")
+def profile():
+    sp = get_authenticated_client()
+    if not sp:
+        return redirect(url_for("login"))
+
     try:
-        auth_manager = create_spotify_oauth()
-        cache_handler = getattr(auth_manager, 'cache_handler', None)
-        if cache_handler:
-            if hasattr(cache_handler, 'delete'):
-                cache_handler
-            elif hasattr(cache_handler, 'clear_cache'):
-                cache_handler.clear_cache()
-            elif hasattr(cache_handler, 'cache_path'):
-                try:
-                    os.remove(cache_handler.cache_path)
-                except Exception:
-                    pass
-    except Exception as e:
-        print(f"Error limpiando cache de spotipy: {e}")
+        user          = spotify_api.get_user_profile(sp)
+        top_tracks    = spotify_api.get_top_tracks(sp, limit=10)
+        top_artists   = spotify_api.get_top_artists(sp, limit=10)
+        recent_tracks = spotify_api.get_recent_tracks(sp, limit=10)
+        followed      = spotify_api.get_followed_artists(sp, limit=10)
+    except Exception:
+        logger.exception("Error al cargar el perfil")
+        abort(503)
 
-    # Redirigir al index; limpiar cookies de la sesión
-    response = redirect(url_for('index'))
-    response.set_cookie('session', '', expires=0)
-    return response
+    return render_template(
+        "profile.html",
+        user=user,
+        top_tracks=top_tracks,
+        top_artists=top_artists,
+        recent_tracks=recent_tracks,
+        followed_artists=followed,
+    )
 
-# Ruta de prueba para credenciales (SIN mostra el secret)
-'''@app.route('/test')
-def test_credentials():
-    client_id = os.getenv('SPOTIPY_CLIENT_ID')
-    return f"<h1>Test de credenciales</h1><p>Client ID cargado: {'✅ Sí' if client_id else '❌ No'}</p>"
-'''
 
-if __name__ == '__main__':
-    app.run(debug=True, host='127.0.0.1', port=5000, ssl_context='adhoc')
+@app.route("/stats/<time_range>")
+def stats(time_range):
+    if time_range not in config.VALID_TIME_RANGES:
+        return redirect(url_for("profile"))
 
+    sp = get_authenticated_client()
+    if not sp:
+        return redirect(url_for("login"))
+
+    try:
+        user        = spotify_api.get_user_profile(sp)
+        top_tracks  = spotify_api.get_top_tracks(sp, time_range=time_range, limit=20)
+        top_artists = spotify_api.get_top_artists(sp, time_range=time_range, limit=20)
+        top_genres  = spotify_api.get_genre_breakdown(top_artists, top_n=10)
+    except Exception:
+        logger.exception("Error al cargar estadísticas para %s", time_range)
+        abort(503)
+
+    return render_template(
+        "detailed_stats.html",
+        user=user,
+        top_tracks=top_tracks,
+        top_artists=top_artists,
+        top_genres=top_genres,
+        time_range=time_range,
+        time_range_name=config.VALID_TIME_RANGES[time_range],
+    )
+
+
+# ── Páginas de error ──────────────────────────────────────────────────────────
+
+@app.errorhandler(503)
+def service_unavailable(e):
+    return render_template("error.html", message="No se pudo conectar con Spotify. Intenta de nuevo en unos segundos."), 503
+
+@app.errorhandler(404)
+def not_found(e):
+    return render_template("error.html", message="Esta página no existe."), 404
+
+
+# ── Arranque ──────────────────────────────────────────────────────────────────
+
+if __name__ == "__main__":
+    app.run(debug=config.FLASK_DEBUG, host="127.0.0.1", port=5000)

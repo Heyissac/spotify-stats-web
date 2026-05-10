@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Error{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 4rem 1rem;">
+  <h1 style="font-size: 2rem; margin-bottom: 1rem;">Algo salió mal</h1>
+  <p style="color: #b3b3b3;">{{ message }}</p>
+  <a href="{{ url_for('index') }}" style="display: inline-block; margin-top: 2rem;">
+    ← Volver al inicio
+  </a>
+</div>
+{% endblock %}
