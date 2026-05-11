@@ -33,10 +33,3 @@ VALID_TIME_RANGES = {
     "medium_term": "Últimos 6 meses",
     "long_term":   "Varios años",
 }
-
-# Artistas usados para poblar la sección de álbumes en el index
-FEATURED_ARTISTS = [
-    "Taylor Swift", "Bad Bunny", "Drake", "The Weeknd",
-    "Ed Sheeran", "Ariana Grande", "Billie Eilish",
-    "Post Malone", "Dua Lipa", "Harry Styles",
-]
