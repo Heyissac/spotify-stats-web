@@ -18,7 +18,7 @@ FLASK_DEBUG = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
 
 SPOTIFY_CLIENT_ID     = os.environ.get("SPOTIFY_CLIENT_ID")
 SPOTIFY_CLIENT_SECRET = os.environ.get("SPOTIFY_CLIENT_SECRET")
-SPOTIFY_REDIRECT_URI  = os.environ.get("SPOTIFY_REDIRECT_URI", "http://localhost:5000/callback")
+SPOTIFY_REDIRECT_URI  = os.environ.get("SPOTIFY_REDIRECT_URI", "http://127.0.0.1:5000/callback")
 
 SPOTIFY_SCOPE = (
     "user-top-read "
