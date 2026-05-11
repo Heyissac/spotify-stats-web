@@ -9,7 +9,9 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Babylonica&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Babylonica&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap"
+    rel="stylesheet">
 
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
@@ -24,15 +26,17 @@
     <div class="navbar__inner">
       <a href="/" class="navbar__brand" aria-label="Ir a inicio">
         <svg class="navbar__brand-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+          <path
+            d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
         </svg>
         <span class="navbar__brand-name">Mousiké</span>
       </a>
 
       <div class="navbar__actions">
         <a href="/" class="btn btn--ghost btn--sm">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <path d="M19 12H5M12 5l-7 7 7 7"/>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            aria-hidden="true">
+            <path d="M19 12H5M12 5l-7 7 7 7" />
           </svg>
           Inicio
         </a>
@@ -50,13 +54,8 @@
       <!-- Avatar -->
       <div class="profile-avatar">
         {% if user.images %}
-        <img
-          class="profile-avatar__img"
-          src="{{ user.images[0].url }}"
-          alt="Foto de perfil de {{ user.display_name }}"
-          width="120"
-          height="120"
-        >
+        <img class="profile-avatar__img" src="{{ user.images[0].url }}" alt="Foto de perfil de {{ user.display_name }}"
+          width="120" height="120">
         {% else %}
         <div class="profile-avatar__img profile-avatar__img--placeholder" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="40" height="40">
@@ -67,7 +66,8 @@
         {% endif %}
         <div class="profile-avatar__badge" aria-label="Conectado a Spotify">
           <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12" aria-hidden="true">
-            <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+            <path
+              d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
           </svg>
         </div>
       </div>
@@ -125,23 +125,12 @@
       <ul class="track-grid" role="list">
         {% for track in top_tracks %}
         <li class="track-card" data-animate style="--stagger: {{ loop.index0 * 35 }}ms">
-          <a
-            href="https://open.spotify.com/track/{{ track.id }}"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="track-card__link"
-            aria-label="{{ track.name }} de {{ track.artists[0].name }}, abrir en Spotify"
-          >
+          <a href="https://open.spotify.com/track/{{ track.id }}" target="_blank" rel="noopener noreferrer"
+            class="track-card__link" aria-label="{{ track.name }} de {{ track.artists[0].name }}, abrir en Spotify">
             <div class="track-card__cover-wrap">
-              <img
-                class="track-card__cover"
+              <img class="track-card__cover"
                 src="{{ track.album.images[0].url if track.album.images else url_for('static', filename='assets/placeholder-album.svg') }}"
-                alt="Portada de {{ track.name }}"
-                width="160"
-                height="160"
-                loading="lazy"
-                decoding="async"
-              >
+                alt="Portada de {{ track.name }}" width="160" height="160" loading="lazy" decoding="async">
               <span class="track-card__rank" aria-label="Posición {{ loop.index }}">{{ loop.index }}</span>
               <div class="track-card__play-overlay" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
@@ -176,24 +165,13 @@
       <!-- Top 3 podio -->
       <div class="podium" aria-label="Top 3 artistas">
         {% for artist in top_artists[:3] %}
-        <a
-          href="https://open.spotify.com/artist/{{ artist.id }}"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="podium__card podium__card--{{ loop.index }}"
-          data-animate
-          style="--stagger: {{ loop.index0 * 80 }}ms"
-          aria-label="{{ artist.name }}, posición {{ loop.index }}"
-        >
+        <a href="https://open.spotify.com/artist/{{ artist.id }}" target="_blank" rel="noopener noreferrer"
+          class="podium__card podium__card--{{ loop.index }}" data-animate style="--stagger: {{ loop.index0 * 80 }}ms"
+          aria-label="{{ artist.name }}, posición {{ loop.index }}">
           <span class="podium__rank" aria-hidden="true">{{ loop.index }}</span>
-          <img
-            class="podium__img"
+          <img class="podium__img"
             src="{{ artist.images[0].url if artist.images else url_for('static', filename='assets/placeholder-artist.svg') }}"
-            alt="Foto de {{ artist.name }}"
-            width="100"
-            height="100"
-            loading="lazy"
-          >
+            alt="Foto de {{ artist.name }}" width="100" height="100" loading="lazy">
           <p class="podium__name">{{ artist.name }}</p>
           <p class="podium__genres">
             {{ artist.genres[:2] | join(', ') | title if artist.genres else 'Artista' }}
@@ -208,22 +186,12 @@
       <ul class="artist-list" role="list" aria-label="Artistas del 4 al 10">
         {% for artist in top_artists[3:] %}
         <li class="artist-row" data-animate style="--stagger: {{ loop.index0 * 40 }}ms">
-          <a
-            href="https://open.spotify.com/artist/{{ artist.id }}"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="artist-row__link"
-            aria-label="{{ artist.name }}, posición {{ loop.index + 3 }}, abrir en Spotify"
-          >
+          <a href="https://open.spotify.com/artist/{{ artist.id }}" target="_blank" rel="noopener noreferrer"
+            class="artist-row__link" aria-label="{{ artist.name }}, posición {{ loop.index + 3 }}, abrir en Spotify">
             <span class="artist-row__rank" aria-hidden="true">{{ loop.index + 3 }}</span>
-            <img
-              class="artist-row__img"
+            <img class="artist-row__img"
               src="{{ artist.images[0].url if artist.images else url_for('static', filename='assets/placeholder-artist.svg') }}"
-              alt="Foto de {{ artist.name }}"
-              width="48"
-              height="48"
-              loading="lazy"
-            >
+              alt="Foto de {{ artist.name }}" width="48" height="48" loading="lazy">
             <div class="artist-row__info">
               <p class="artist-row__name">{{ artist.name }}</p>
               <p class="artist-row__genres">{{ artist.genres[:2] | join(', ') | title if artist.genres else '' }}</p>
@@ -248,27 +216,14 @@
 
       <ul class="recent-list" id="recent-list" role="list">
         {% for item in recent_tracks %}
-        <li
-          class="recent-row{% if loop.index > 4 %} recent-row--hidden{% endif %}"
-          data-animate
-          style="--stagger: {{ loop.index0 * 40 }}ms"
-          data-index="{{ loop.index }}"
-        >
-          <a
-            href="https://open.spotify.com/track/{{ item.track.id }}"
-            target="_blank"
-            rel="noopener noreferrer"
+        <li class="recent-row{% if loop.index > 4 %} recent-row--hidden{% endif %}" data-animate
+          style="--stagger: {{ loop.index0 * 40 }}ms" data-index="{{ loop.index }}">
+          <a href="https://open.spotify.com/track/{{ item.track.id }}" target="_blank" rel="noopener noreferrer"
             class="recent-row__link"
-            aria-label="{{ item.track.name }} de {{ item.track.artists[0].name }}, abrir en Spotify"
-          >
-            <img
-              class="recent-row__img"
+            aria-label="{{ item.track.name }} de {{ item.track.artists[0].name }}, abrir en Spotify">
+            <img class="recent-row__img"
               src="{{ item.track.album.images[0].url if item.track.album.images else url_for('static', filename='assets/placeholder-album.svg') }}"
-              alt="Portada de {{ item.track.name }}"
-              width="52"
-              height="52"
-              loading="lazy"
-            >
+              alt="Portada de {{ item.track.name }}" width="52" height="52" loading="lazy">
             <div class="recent-row__info">
               <p class="recent-row__name">{{ item.track.name }}</p>
               <p class="recent-row__artist">{{ item.track.artists[0].name }}</p>
@@ -285,7 +240,8 @@
       <div class="recent-toggle-wrap">
         <button class="btn btn--ghost" id="recent-toggle" aria-expanded="false" aria-controls="recent-list">
           <span id="recent-toggle-text">Ver más</span>
-          <svg id="recent-toggle-icon" class="recent-toggle__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15" aria-hidden="true">
+          <svg id="recent-toggle-icon" class="recent-toggle__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" width="15" height="15" aria-hidden="true">
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
         </button>
@@ -299,8 +255,14 @@
 
   <footer class="site-footer" role="contentinfo">
     <p class="site-footer__text">
-      Hecho con
-      <a href="https://developer.spotify.com" target="_blank" rel="noopener noreferrer">Spotify Web API</a>
+      Desarrollado por
+      <a href="https://github.com/Heyissac" target="_blank" rel="noopener noreferrer">
+        Hey Issac
+      </a>
+      · Con
+      <a href="https://developer.spotify.com" target="_blank" rel="noopener noreferrer">
+        Spotify Web API
+      </a>
     </p>
   </footer>
 
