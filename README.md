@@ -1,7 +1,5 @@
 ﻿<div align="center">
 
-<img src="https://raw.githubusercontent.com/Heyissac/spotify-stats-web/main/static/img/logo.png" alt="Mousiké Logo" width="80" />
-
 # Mousiké
 
 **Your Spotify stats, beautifully visualized.**
