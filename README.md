@@ -39,17 +39,6 @@ This project was built as a full-stack exercise integrating REST API consumption
 
 ---
 
-## 📸 Screenshots
-
-> _Add screenshots of your app here. You can drag and drop images directly into the GitHub editor._
-
-| Landing Page | Profile View | Stats View |
-|:---:|:---:|:---:|
-| <img width="1859" height="1739" alt="landing" src="https://github.com/user-attachments/assets/8e73db61-fbeb-4040-8298-302c41952201" /> | <img width="1859" height="4045" alt="profile" src="https://github.com/user-attachments/assets/b8c14183-32fd-4ece-a707-216320647daf" /> | <img width="1851" height="3607" alt="stats" src="https://github.com/user-attachments/assets/171b30a0-6bfc-49e2-8c9a-f41206514718" /> |
-
-
----
-
 ## 🛠 Tech Stack
 
 ```
